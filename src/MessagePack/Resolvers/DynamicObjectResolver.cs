@@ -1806,7 +1806,7 @@ typeof(int), typeof(int) });
             {
                 if (IsProperty)
                 {
-                    return PropertyInfo.GetValue(value);
+                    return PropertyInfo.GetValue(value, null);
                 }
                 else
                 {
@@ -1818,7 +1818,7 @@ typeof(int), typeof(int) });
             {
                 if (IsProperty)
                 {
-                    PropertyInfo.SetValue(obj, value);
+                    PropertyInfo.SetValue(obj, value, null);
                 }
                 else
                 {
