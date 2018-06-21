@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD
+﻿//#if NETSTANDARD
 
 using System;
 using System.IO;
@@ -118,6 +118,10 @@ namespace MessagePack
                 public readonly Func<ArraySegment<byte>, IFormatterResolver, object> deserialize8;
                 public readonly RawFormatterDeserialize deserialize9;
 
+				public UnaryExpression Unbox(Expression expr, Type t)
+				{
+					return Expression.Convert(expr, t);
+				}
                 public CompiledMethods(Type type)
                 {
                     var ti = type.GetTypeInfo();
@@ -127,7 +131,7 @@ namespace MessagePack
 
                         var param1 = Expression.Parameter(typeof(object), "obj");
                         var body = Expression.Call(serialize, ti.IsValueType
-                            ? Expression.Unbox(param1, type)
+                            ? Unbox(param1, type)
                             : Expression.Convert(param1, type));
                         var lambda = Expression.Lambda<Func<object, byte[]>>(body, param1).Compile();
 
@@ -141,7 +145,7 @@ namespace MessagePack
                         var param2 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
                         var body = Expression.Call(serialize, ti.IsValueType
-                            ? Expression.Unbox(param1, type)
+                            ? Unbox(param1, type)
                             : Expression.Convert(param1, type), param2);
                         var lambda = Expression.Lambda<Func<object, IFormatterResolver, byte[]>>(body, param1, param2).Compile();
 
@@ -155,7 +159,7 @@ namespace MessagePack
                         var param2 = Expression.Parameter(typeof(object), "obj");
 
                         var body = Expression.Call(serialize, param1, ti.IsValueType
-                            ? Expression.Unbox(param2, type)
+                            ? Unbox(param2, type)
                             : Expression.Convert(param2, type));
                         var lambda = Expression.Lambda<Action<Stream, object>>(body, param1, param2).Compile();
 
@@ -170,7 +174,7 @@ namespace MessagePack
                         var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
                         var body = Expression.Call(serialize, param1, ti.IsValueType
-                            ? Expression.Unbox(param2, type)
+                            ? Unbox(param2, type)
                             : Expression.Convert(param2, type), param3);
                         var lambda = Expression.Lambda<Action<Stream, object, IFormatterResolver>>(body, param1, param2, param3).Compile();
 
@@ -186,7 +190,7 @@ namespace MessagePack
                         var param4 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
                         var body = Expression.Call(serialize, param1, param2, ti.IsValueType
-                            ? Expression.Unbox(param3, type)
+                            ? Unbox(param3, type)
                             : Expression.Convert(param3, type), param4);
                         var lambda = Expression.Lambda<RawFormatterSerialize>(body, param1, param2, param3, param4).Compile();
 
@@ -317,4 +321,4 @@ namespace MessagePack
     }
 }
 
-#endif
+//#endif
