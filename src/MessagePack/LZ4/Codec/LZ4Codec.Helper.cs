@@ -4,7 +4,7 @@ namespace MessagePack.LZ4
 {
     public static partial class LZ4Codec
     {
-#if NETSTANDARD
+#if NETSTANDARD || ENABLE_UNSAFE_MSGPACK
 
         public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
@@ -32,9 +32,9 @@ namespace MessagePack.LZ4
 
 #else
 
-        // use 'Safe' code for Unity because in IL2CPP gots strange behaviour.
+		// use 'Safe' code for Unity because in IL2CPP gots strange behaviour.
 
-        public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
+		public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
             if (IntPtr.Size == 4)
             {
