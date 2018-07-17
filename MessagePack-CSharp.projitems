@@ -58,6 +58,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\Codec\LZ4Codec.Unsafe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\Codec\LZ4Codec.Unsafe32.Dirty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\Codec\LZ4Codec.Unsafe64.Dirty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\Codec\LZ4Codec.Unsafe64HC.Dirty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\LZ4MessagePackSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\LZ4MessagePackSerializer.JSON.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)src\MessagePack\LZ4\LZ4MessagePackSerializer.NonGeneric.cs" />

@@ -34,11 +34,86 @@ namespace MessagePack.LZ4
     /// <summary>Unsafe LZ4 codec.</summary>
     public static partial class LZ4Codec
     {
-        /// <summary>Copies block of memory.</summary>
-        /// <param name="src">The source.</param>
-        /// <param name="dst">The destination.</param>
-        /// <param name="len">The length (in bytes).</param>
-        private static unsafe void BlockCopy(byte* src, byte* dst, int len)
+		#region HC utilities
+
+		// ReSharper disable InconsistentNaming
+
+		private unsafe class LZ4HC_Data_Structure
+		{
+			public byte* src_base;
+			public byte* nextToUpdate;
+			public int[] hashTable;
+			public ushort[] chainTable;
+		};
+
+		// ReSharper restore InconsistentNaming
+		private static unsafe void BlockFill(byte* dst, int len, byte val)
+		{
+			if (len >= 8)
+			{
+				ulong mask = val;
+				mask |= mask << 8;
+				mask |= mask << 16;
+				mask |= mask << 32;
+				do
+				{
+					*(ulong*)dst = mask;
+					dst += 8;
+					len -= 8;
+				} while (len >= 8);
+			}
+
+			while (len-- > 0) *dst++ = val;
+		}
+
+		public static unsafe int Encode64HC(
+			byte[] input,
+			int inputOffset,
+			int inputLength,
+			byte[] output,
+			int outputOffset,
+			int outputLength)
+		{
+			if (inputLength == 0) return 0;
+
+			fixed (byte* inputPtr = &input[inputOffset])
+			fixed (byte* outputPtr = &output[outputOffset])
+			{
+				var length = LZ4_compressHC_64(inputPtr, outputPtr, inputLength, outputLength);
+				// NOTE: there is a potential problem here as original implementation returns 0 not -1
+				return length <= 0 ? -1 : length;
+			}
+		}
+		private static unsafe int LZ4_compressHC_64(byte* input, byte* output, int inputLength, int outputLength)
+		{
+			return LZ4_compressHCCtx_64(LZ4HC_Create(input), input, output, inputLength, outputLength);
+		}
+
+		private static unsafe LZ4HC_Data_Structure LZ4HC_Create(byte* src)
+		{
+			var hc4 = new LZ4HC_Data_Structure
+			{
+				hashTable = new int[HASHHC_TABLESIZE],
+				chainTable = new ushort[MAXD]
+			};
+
+			fixed (ushort* ct = &hc4.chainTable[0])
+			{
+				BlockFill((byte*)ct, MAXD * sizeof(ushort), 0xFF);
+			}
+
+			hc4.src_base = src;
+			hc4.nextToUpdate = src + 1;
+
+			return hc4;
+		}
+
+		#endregion
+		/// <summary>Copies block of memory.</summary>
+		/// <param name="src">The source.</param>
+		/// <param name="dst">The destination.</param>
+		/// <param name="len">The length (in bytes).</param>
+		private static unsafe void BlockCopy(byte* src, byte* dst, int len)
         {
             while (len >= 8)
             {

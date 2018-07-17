@@ -14,7 +14,7 @@ namespace MessagePack.LZ4
             }
             else
             {
-                return LZ4Codec.Encode64Unsafe(input, inputOffset, inputLength, output, outputOffset, outputLength);
+                return LZ4Codec.Encode64HC(input, inputOffset, inputLength, output, outputOffset, outputLength);
             }
         }
 

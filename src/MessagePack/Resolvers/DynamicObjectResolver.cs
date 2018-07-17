@@ -1337,8 +1337,9 @@ typeof(int), typeof(int) });
                     if (item.GetCustomAttribute<IgnoreMemberAttribute>(true) != null) continue;
                     if (item.GetCustomAttribute<IgnoreDataMemberAttribute>(true) != null) continue;
                     if (item.IsIndexer()) continue;
+					var key = item.GetCustomAttribute<KeyAttribute>(true);
 
-                    var getMethod = item.GetGetMethod(true);
+					var getMethod = item.GetGetMethod(true);
                     var setMethod = item.GetSetMethod(true);
 
                     var member = new EmittableMember
@@ -1346,7 +1347,7 @@ typeof(int), typeof(int) });
                         PropertyInfo = item,
                         IsReadable = (getMethod != null) && (allowPrivate || getMethod.IsPublic) && !getMethod.IsStatic,
                         IsWritable = (setMethod != null) && (allowPrivate || setMethod.IsPublic) && !setMethod.IsStatic,
-                        StringKey = item.Name
+                        StringKey = key?.StringKey ?? item.Name
                     };
                     if (!member.IsReadable && !member.IsWritable) continue;
                     member.IntKey = hiddenIntKey++;
@@ -1365,13 +1366,14 @@ typeof(int), typeof(int) });
                     if (item.GetCustomAttribute<IgnoreDataMemberAttribute>(true) != null) continue;
                     if (item.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>(true) != null) continue;
                     if (item.IsStatic) continue;
+					var key = item.GetCustomAttribute<KeyAttribute>(true);
 
-                    var member = new EmittableMember
+						var member = new EmittableMember
                     {
                         FieldInfo = item,
                         IsReadable = allowPrivate || item.IsPublic,
                         IsWritable = allowPrivate || (item.IsPublic && !item.IsInitOnly),
-                        StringKey = item.Name
+                        StringKey = key?.StringKey ?? item.Name
                     };
                     if (!member.IsReadable && !member.IsWritable) continue;
                     member.IntKey = hiddenIntKey++;
